@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.edu.dao.ExamDao">
+	<resultMap type="examination" id="examinationMap" autoMapping="true">
+	<association property="examinationpaper" column="papername" select="queryPaperByName"></association>
+	
+	</resultMap>
+	<select id="listExam" resultType="examination">
+		select * from examination order by eid desc
+	</select>
+
+	<select id="listClasses" resultType="classes">
+		select * from classes
+	</select>
+
+	<select id="listExaminationpaper" resultType="examinationpaper">
+		select * from examination_paper
+	</select>
+
+	<select id="selectExam" parameterType="vo" resultMap="examinationMap">
+		select * from examination e join examination_paper p on (e.paperid = p.paperid) 
+		<where>
+			<if test="clsname != null and clsname.trim() !=''">
+				and clsname = #{clsname}
+			</if>
+			<if test="papername != null and papername.trim() !=''">
+				and name = #{papername}
+			</if>
+		</where>
+	</select>
+
+	<insert id="addexam" parameterType="examination">
+		insert into examination (ename,clsname,starttime,endtime,paperid,clsid)
+		values(#{ename},#{clsname},#{starttime},#{endtime},#{paperid},#{clsid})
+	</insert>
+
+	<select id="selectTypeid" parameterType="vo" resultType="int">
+		select typeid from classes where clsname=#{clsname}
+	</select>
+
+	<select id="selectPaper" parameterType="int" resultType="examinationpaper">
+		select paperid from examination_paper where typeid=#{typeid}
+	</select>
+
+	<select id="selectClsid" parameterType="examination" resultType="int">
+		select clsid from classes where clsname = #{clsname}
+	</select>
+
+	<select id="listClsname" resultType="classes">
+		select clsname from classes
+	</select>
+
+	<select id="listThisExam" parameterType="int" resultType="examination">
+		select * from examination where eid=#{eid}
+	</select>
+
+	<update id="updateExam" parameterType="examination">
+		update examination set ename
+		=#{ename},clsname=#{clsname},starttime=#{starttime},endtime=#{endtime},paperid=#{paperid},clsid=#{clsid}
+		where eid=#{eid}
+	</update>
+	
+	<select id="selectPaperid" parameterType="vo" resultType="int">
+		select paperid from examination_paper 
+		<where>
+			<if test="papername != null and clsname.trim() !=''">
+				and name=#{papername}
+			</if>
+		</where>
+	</select>
+	
+	<delete id="deleteExam" parameterType="int" >
+		delete from examination where eid = #{eid}
+	</delete>
+</mapper>

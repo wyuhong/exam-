@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <!-- 
+  namespace属性:命名空间, 作用就是对sql进行分类管理, sql隔离
+   -->
+<mapper namespace="com.edu.dao.UserDao">
+<resultMap type="user" id="userMap" autoMapping="true">
+	<association property="student" javaType="student" autoMapping="true"></association>
+</resultMap>
+	<select id="login"  resultMap="userMap">
+  		select * from user u join student s on (s.stuid=u.stuid) where username=#{username} and password=#{password}
+  	</select>
+	<select id="mangerLogin" resultType="user">
+  		select * from user where username=#{username} and password=#{password}
+  	</select>
+</mapper>

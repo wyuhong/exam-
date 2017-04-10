@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace属性:命名空间, 作用就是对sql进行分类管理, sql隔离 -->
+<mapper namespace="com.edu.dao.TeacherDao">
+	<resultMap type="teacher" id="teacherMap" autoMapping="true">
+		<association property="type" column="typeid" select="queryTypeById"></association>
+	    <association property="cls" column="clsid" select="queryClsById"></association>
+	</resultMap>
+	<select id="listTeachers" resultMap="teacherMap">
+		select * from teacher te
+		left join type ty on (te.typeid=ty.typeid) left join classes c on
+		(te.clsid=c.clsid) limit #{startRow},#{pageSize}
+	</select>
+	<select id="queryTypeById" resultType="type">
+	select * from type where typeid=#{typeid}
+	</select>
+	
+	<select id="queryClsById" resultType="classes">
+	select * from classes where clsid=#{clsid}
+	</select>
+	<select id="countTeacher" resultType="int">
+		select count(*) from teacher
+	</select>
+
+	<select id="searching" resultMap="teacherMap">
+		select * from teacher te
+		left join type ty on (te.typeid=ty.typeid) left join classes c on
+		(te.clsid=c.clsid) 
+
+		<where>
+			<if test="teacher.tname != null and teacher.tname.trim() !=''">
+				and te.tname like #{teacher.tname}
+			</if>
+			<if test="teacher.entrytime!=null">
+				and te.entrytime like #{teacher.entrytime}
+			</if>
+			<if test="teacher.status!=null">
+				and te.status=#{teacher.status}
+			</if>
+			<if test="teacher.type.typeId!=null">
+				and te.typeid=#{teacher.type.typeId}
+			</if>
+
+		</where>
+		limit #{startRow},#{pageSize}
+	</select>
+
+	<select id="countFuzzyTeacher" parameterType="teacher"
+		resultType="int">
+		select count(*) from teacher
+		<where>
+			<if test="tname != null and tname.trim() !=''">
+				and tname like #{tname}
+			</if>
+			<if test="entrytime!=null">
+				and entrytime like #{entrytime}
+			</if>
+			<if test="status!=null">
+				and status=#{status}
+			</if>
+			<if test="type.typeId!=null">
+				and typeid=#{type.typeId}
+			</if>
+
+		</where>
+
+	</select>
+
+	<select id="listTypes" resultType="type">
+	select * from type
+	</select>
+	<select id="listClasses" resultType="classes"> 
+	select * from classes
+	</select>
+	<insert id="addTeacher" parameterType="teacher">
+		insert into teacher(tname,typeid,entrytime,experience,status,clsid)
+		values(#{tname},#{type.typeId},#{entrytime},#{experience},#{status},#{clsid})
+	</insert>
+	<update id="updateTeacher" parameterType="teacher">
+		update teacher set
+		tname=#{tname},typeid=#{type.typeId},entrytime=#{entrytime},experience=#{experience},status=#{status},clsid=#{clsid}
+		where tid=#{tid}
+	</update>
+
+	<select id="findTeacherByTid" parameterType="int" resultType="teacher">
+		select * from teacher where tid=#{tid}
+	</select>
+	<update id="updateStatus1ByTid" parameterType="int">
+		update teacher set status=3 where tid=#{tid}
+	</update>
+
+	<update id="updateStatus2ByTid" parameterType="int">
+		update teacher set status=0 where tid=#{tid}
+	</update>
+</mapper>

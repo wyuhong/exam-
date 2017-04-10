@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace属性:命名空间, 作用就是对sql进行分类管理, sql隔离 -->
+<mapper namespace="com.edu.dao.HeadTeacherDao">
+	
+	<select id="listHeadTeachers" resultType="headteacher">
+	select * from headteacher limit #{startRow},#{pageSize}
+	</select>
+	<select id="countHeadTeacher" resultType="int">
+	select count(*) from headteacher
+	</select>
+	<insert id="addHeadTeacher" parameterType="headteacher">
+	insert into headteacher(hname,entrytime,experience,status) values(#{hname},#{entrytime},#{experience},#{status}) 
+	</insert>
+	
+	<select id="searchHeadteacher" resultType="headteacher">
+		select * from headteacher
+
+		<where>
+			<if test="headteacher.hname != null and headteacher.hname.trim() !=''">
+				and hname like #{headteacher.hname}
+			</if>
+			<if test="headteacher.entrytime!=null">
+				and entrytime=#{headteacher.entrytime}
+			</if>
+			<if test="headteacher.status!=null">
+				and status=#{headteacher.status}
+			</if>
+		</where>
+		limit #{startRow},#{pageSize}
+	</select>
+	
+	<select id="findHeadTeacherByHid" parameterType="int" resultType="headteacher">
+	select * from headteacher where hid=#{hid}
+	</select>
+	<update id="updateHeadTeacherByHid" parameterType="headteacher">
+	update headteacher set hname=#{hname},entrytime=#{entrytime},experience=#{experience},status=#{status} where hid=#{hid}
+	</update>
+	<update id="updateHeadTeacherStatusByHid" parameterType="int">
+	update headteacher set status=0 where hid=#{hid}
+	</update>
+	<select id="countFuzzyHeadTeacher" parameterType="headteacher"  resultType="int">
+	select count(*) from headteacher 
+	<where>
+			<if test="hname != null and hname.trim() !=''">
+				and hname like #{hname}
+			</if>
+			<if test="entrytime!=null">
+				and entrytime=#{entrytime}
+			</if>
+			<if test="status!=null">
+				and status=#{status}
+			</if>
+		</where>
+	</select>
+	
+	
+</mapper>

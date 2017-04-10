@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <!-- 
+  namespace属性:命名空间, 作用就是对sql进行分类管理, sql隔离
+   -->
+<mapper namespace="com.edu.dao.StudentDao">
+	<resultMap type="student" id="studentMap" autoMapping="true">
+	    <association property="classes" column="clsid" select="queryClsById"></association>
+	</resultMap>
+	<select id="queryClsById" resultType="classes">
+	select * from classes where clsid=#{clsid}
+	</select>
+	<select id="listStudents" resultMap="studentMap">
+	select * from student s join classes c on(s.clsid=c.clsid) 
+	</select>
+	
+	<select id="searchFuzzyStudents" parameterType="student" resultMap="studentMap">
+	select * from student s join classes c on(s.clsid=c.clsid)
+	<where>
+			<if test="stuName != null and stuName.trim() !=''">
+				and s.stuName like #{stuName}
+			</if>
+			<if test="classes.clsid!=null">
+				and s.clsid = #{classes.clsid}
+			</if>
+			<if test="status!=null">
+				and s.status=#{status}
+			</if>
+			<if test="school!=null and school.trim() !=''">
+				and s.school like #{school}
+			</if>
+			<if test="birthDay!=null">
+				and s.birthDay=#{birthDay}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="AddStudents" parameterType="student">
+	insert into student(clsid,stuName,school,birthDay,phone,classTime,status,sex,birthPlace)
+	values(clsid=#{classes.clsid},stuName=#{stuName},school=#{school},birthDay=#{birthDay},phone=#{phone},classTime=#{classTime},status=#{status},sex=#{sex},birthPlace=#{birthPlace})
+	</insert>
+</mapper>

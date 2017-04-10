@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.edu.dao.ClassesDao">
+  <resultMap type="classes" id="classesMap" autoMapping="true">
+  	<association property="type" column="typeid" select="queryTypeId"></association>
+  	<association property="teacher" column="tid" select="queryTid"></association>
+  	<association property="headTeacher" column="hid" select="queryHid"></association>
+  </resultMap>
+   
+	<select id="findClass" resultMap="classesMap">
+		select * from classes c left join type t on (c.typeid=t.typeid) left join teacher te on (c.tid=te.tid) left join headteacher h on (h.hid=c.hid)
+	</select>
+	
+	<select id="queryTypeId" resultType="type">
+		select * from type where typeid=#{typeId}
+	</select>
+	<select id="queryTid" resultType="teacher">
+		select * from teacher where tid=#{tid}
+	</select>
+	<select id="queryHid" resultType="headTeacher">
+		select * from headteacher where hid=#{hid}
+	</select>
+	
+	
+	<insert id="addClass" parameterType="classes">
+		insert into classes(clsname,typeid,tid,hid,strartdate,status,studytime) values(#{clsname},#{type.typeId},#{teacher.tid},#{headTeacher.hid},#{strartdate},#{status},#{studytime})
+	</insert>
+	
+	<select id="findClassByinfo" parameterType="vo" resultMap="classesMap">
+		select * from classes c left join teacher te on (te.tid=c.tid) 
+		left join headteacher h on (h.hid=c.hid) left join type t on (t.typeid=c.typeid)
+		
+		<where>
+			<if test="clsname!=null and clsname.trim()!=''">
+				and c.clsname like #{clsname}
+			</if>
+			<if test="tname!=null and tname.trim()!=''">
+				and te.tname like #{tname}
+			</if>
+			<if test="hname!=null and hname.trim()!=''">
+				and h.hname like #{hname}
+			</if>
+			<if test="typeId!=null">
+				and t.typeid=#{typeId}
+			</if>
+			<if test="status!=null">
+				and c.status=#{status}
+			</if>
+			and 1=1
+		</where>
+	</select>
+  </mapper>
